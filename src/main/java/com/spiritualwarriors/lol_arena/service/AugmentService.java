@@ -24,13 +24,13 @@ public class AugmentService {
     }
 
     public List<AugmentDto> getAllAugments() {
-        return augmentRepository.findAll().stream()
+        return augmentRepository.findAllWithTags().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     public List<AugmentDto> getAugmentsByTag(String tagSlug) {
-        return augmentRepository.findByTagSlug(tagSlug).stream()
+        return augmentRepository.findByTagSlugWithTags(tagSlug).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }

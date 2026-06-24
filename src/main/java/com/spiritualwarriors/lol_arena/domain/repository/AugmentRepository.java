@@ -10,6 +10,13 @@ import java.util.List;
 
 @Repository
 public interface AugmentRepository extends JpaRepository<Augment, Long> {
-    @Query("SELECT a FROM Augment a JOIN a.tags t WHERE t.slug = :slug")
-    List<Augment> findByTagSlug(@Param("slug") String slug);
+    @Query("SELECT DISTINCT a FROM Augment a LEFT JOIN FETCH a.tags")
+    List<Augment> findAllWithTags();
+
+    @Query("""
+            SELECT DISTINCT a FROM Augment a
+            JOIN FETCH a.tags t
+            WHERE t.slug = :slug
+            """)
+    List<Augment> findByTagSlugWithTags(@Param("slug") String slug);
 }
