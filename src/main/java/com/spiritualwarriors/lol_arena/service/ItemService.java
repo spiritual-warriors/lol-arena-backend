@@ -1,7 +1,6 @@
 package com.spiritualwarriors.lol_arena.service;
 
 import com.spiritualwarriors.lol_arena.domain.dto.ItemDto;
-import com.spiritualwarriors.lol_arena.domain.dto.TagDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Item;
 import com.spiritualwarriors.lol_arena.domain.entity.Tag;
 import com.spiritualwarriors.lol_arena.domain.repository.ItemRepository;
@@ -24,13 +23,13 @@ public class ItemService {
     }
 
     public List<ItemDto> getAllItems() {
-        return itemRepository.findAll().stream()
+        return itemRepository.findAllWithTags().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     public List<ItemDto> getItemsByTag(String tagSlug) {
-        return itemRepository.findByTagSlug(tagSlug).stream()
+        return itemRepository.findByTagSlugWithTags(tagSlug).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
