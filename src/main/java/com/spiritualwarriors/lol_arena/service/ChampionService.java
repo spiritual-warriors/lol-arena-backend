@@ -6,6 +6,7 @@ import com.spiritualwarriors.lol_arena.domain.entity.Champion;
 import com.spiritualwarriors.lol_arena.domain.repository.ChampionRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ public class ChampionService {
     public List<ChampionDto> getAllChampions() {
         return championRepository.findAll().stream()
                 .map(this::mapToDto)
+                .sorted(Comparator.comparing(ChampionDto::getName))
                 .collect(Collectors.toList());
     }
 

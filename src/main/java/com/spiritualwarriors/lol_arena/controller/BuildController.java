@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/builds")
 public class BuildController {
@@ -15,6 +17,11 @@ public class BuildController {
 
     public BuildController(BuildService buildService) {
         this.buildService = buildService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<BuildDto>> getAllBuilds() {
+        return ResponseEntity.ok(buildService.getAllBuilds());
     }
 
     @GetMapping("/{id}")

@@ -8,6 +8,7 @@ public class BuildDto {
     private Long id;
     private String championId;
     private String championName;
+    private String title;
     private String description;
     private String effectivity;
     private Set<ItemDto> items;

@@ -50,8 +50,16 @@ public class BuildService {
     }
 
     @Transactional
+    public List<BuildDto> getAllBuilds() {
+        return buildRepository.findAll().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
     public BuildDto createBuild(CreateBuildRequest request) {
         Build build = Build.builder()
+                .title(request.getTitle())
                 .description(request.getDescription())
                 .effectivity(request.getEffectivity())
                 .build();
@@ -82,6 +90,7 @@ public class BuildService {
     public BuildDto mapToDto(Build build) {
         BuildDto dto = new BuildDto();
         dto.setId(build.getId());
+        dto.setTitle(build.getTitle());
         dto.setDescription(build.getDescription());
         dto.setEffectivity(build.getEffectivity());
 
