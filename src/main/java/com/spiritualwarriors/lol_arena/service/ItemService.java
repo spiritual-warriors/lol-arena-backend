@@ -28,10 +28,25 @@ public class ItemService {
                 .collect(Collectors.toList());
     }
 
+    public List<ItemDto> getAllItemsAdmin() {
+        return itemRepository.findAllWithTagsAdmin().stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
     public List<ItemDto> getItemsByTag(String tagSlug) {
         return itemRepository.findByTagSlugWithTags(tagSlug).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public ItemDto setItemEnabled(Long itemId, boolean enabled) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Item not found with id: " + itemId));
+        item.setEnabled(enabled);
+        Item saved = itemRepository.save(item);
+        return mapToDto(saved);
     }
 
     @Transactional
@@ -62,6 +77,7 @@ public class ItemService {
         dto.setName(item.getName());
         dto.setDescription(item.getDescription());
         dto.setImage(item.getImage());
+        dto.setEnabled(item.getEnabled());
         dto.setTags(item.getTags().stream()
                 .map(tagService::mapToDto)
                 .collect(Collectors.toSet()));

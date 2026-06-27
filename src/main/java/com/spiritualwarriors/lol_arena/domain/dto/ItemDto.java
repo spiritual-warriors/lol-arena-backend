@@ -10,5 +10,6 @@ public class ItemDto {
     private String name;
     private String description;
     private String image;
+    private Boolean enabled;
     private Set<TagDto> tags;
 }

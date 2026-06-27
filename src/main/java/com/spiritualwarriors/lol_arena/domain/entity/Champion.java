@@ -26,6 +26,10 @@ public class Champion {
     
     private String image;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean enabled = true;
+
     @JdbcTypeCode(SqlTypes.ARRAY)
     @Column(columnDefinition = "varchar[]")
     private List<String> tags;

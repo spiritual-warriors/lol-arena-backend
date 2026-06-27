@@ -28,6 +28,10 @@ public class Augment {
 
     private String image;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean enabled = true;
+
     @ManyToMany(mappedBy = "augments")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

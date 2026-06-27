@@ -1,10 +1,10 @@
 package com.spiritualwarriors.lol_arena.service;
 
 import com.spiritualwarriors.lol_arena.domain.dto.AugmentDto;
-import com.spiritualwarriors.lol_arena.domain.dto.TagDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Augment;
 import com.spiritualwarriors.lol_arena.domain.entity.Tag;
 import com.spiritualwarriors.lol_arena.domain.repository.AugmentRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +23,14 @@ public class AugmentService {
         this.tagService = tagService;
     }
 
+    @Cacheable(value = "augments", key = "'all'")
     public List<AugmentDto> getAllAugments() {
         return augmentRepository.findAllWithTags().stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "augments", key = "'tag:' + #tagSlug")
     public List<AugmentDto> getAugmentsByTag(String tagSlug) {
         return augmentRepository.findByTagSlugWithTags(tagSlug).stream()
                 .map(this::mapToDto)
@@ -64,6 +66,7 @@ public class AugmentService {
         dto.setDescription(augment.getDescription());
         dto.setTier(augment.getTier());
         dto.setImage(augment.getImage());
+        dto.setEnabled(augment.getEnabled());
         dto.setTags(augment.getTags().stream()
                 .map(tagService::mapToDto)
                 .collect(Collectors.toSet()));

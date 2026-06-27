@@ -11,5 +11,6 @@ public class AugmentDto {
     private String description;
     private String tier;
     private String image;
+    private Boolean enabled;
     private Set<TagDto> tags;
 }

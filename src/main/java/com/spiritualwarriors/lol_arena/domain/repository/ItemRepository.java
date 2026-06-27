@@ -10,13 +10,16 @@ import java.util.List;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
-    @Query("SELECT DISTINCT i FROM Item i LEFT JOIN FETCH i.tags")
+    @Query("SELECT DISTINCT i FROM Item i LEFT JOIN FETCH i.tags WHERE i.enabled = true")
     List<Item> findAllWithTags();
+
+    @Query("SELECT DISTINCT i FROM Item i LEFT JOIN FETCH i.tags")
+    List<Item> findAllWithTagsAdmin();
 
     @Query("""
             SELECT DISTINCT i FROM Item i
             JOIN FETCH i.tags t
-            WHERE t.slug = :slug
+            WHERE t.slug = :slug AND i.enabled = true
             """)
     List<Item> findByTagSlugWithTags(@Param("slug") String slug);
 }

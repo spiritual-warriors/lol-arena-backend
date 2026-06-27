@@ -4,6 +4,7 @@ import com.spiritualwarriors.lol_arena.domain.dto.ChampionDto;
 import com.spiritualwarriors.lol_arena.domain.dto.BuildDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Champion;
 import com.spiritualwarriors.lol_arena.domain.repository.ChampionRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -21,13 +22,16 @@ public class ChampionService {
         this.buildService = buildService;
     }
 
+    @Cacheable(value = "champions", key = "'all'")
     public List<ChampionDto> getAllChampions() {
         return championRepository.findAll().stream()
+                .filter(c -> Boolean.TRUE.equals(c.getEnabled()))
                 .map(this::mapToDto)
                 .sorted(Comparator.comparing(ChampionDto::getName))
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(value = "champions", key = "#id")
     public ChampionDto getChampionById(String id) {
         Champion champion = championRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Champion not found with id: " + id));
@@ -47,6 +51,7 @@ public class ChampionService {
         dto.setId(champion.getId());
         dto.setName(champion.getName());
         dto.setImage(champion.getImage());
+        dto.setEnabled(champion.getEnabled());
         dto.setTags(champion.getTags());
         return dto;
     }

@@ -1,6 +1,7 @@
 package com.spiritualwarriors.lol_arena.controller;
 
 import com.spiritualwarriors.lol_arena.domain.dto.ItemDto;
+import com.spiritualwarriors.lol_arena.domain.dto.UpdateEnabledRequest;
 import com.spiritualwarriors.lol_arena.domain.dto.UpdateTagsRequest;
 import com.spiritualwarriors.lol_arena.service.ItemService;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,13 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getItems(@RequestParam(required = false) String tag) {
+    public ResponseEntity<List<ItemDto>> getItems(
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false, defaultValue = "false") boolean includeDisabled
+    ) {
+        if (Boolean.TRUE.equals(includeDisabled)) {
+            return ResponseEntity.ok(itemService.getAllItemsAdmin());
+        }
         if (tag != null && !tag.isEmpty()) {
             return ResponseEntity.ok(itemService.getItemsByTag(tag));
         }
@@ -35,5 +42,11 @@ public class ItemController {
     @DeleteMapping("/{id}/tags/{tagId}")
     public ResponseEntity<ItemDto> removeTagFromItem(@PathVariable Long id, @PathVariable Long tagId) {
         return ResponseEntity.ok(itemService.removeTagFromItem(id, tagId));
+    }
+
+    @PatchMapping("/{id}/enabled")
+    public ResponseEntity<ItemDto> setItemEnabled(@PathVariable Long id, @RequestBody UpdateEnabledRequest request) {
+        boolean enabled = request.getEnabled() == null ? false : request.getEnabled();
+        return ResponseEntity.ok(itemService.setItemEnabled(id, enabled));
     }
 }
