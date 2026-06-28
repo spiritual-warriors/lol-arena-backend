@@ -1,9 +1,8 @@
 package com.spiritualwarriors.lol_arena.service;
 
 import com.spiritualwarriors.lol_arena.domain.dto.BuildDto;
+import com.spiritualwarriors.lol_arena.domain.dto.ChampionDto;
 import com.spiritualwarriors.lol_arena.domain.dto.CreateBuildRequest;
-import com.spiritualwarriors.lol_arena.domain.dto.ItemDto;
-import com.spiritualwarriors.lol_arena.domain.dto.AugmentDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Augment;
 import com.spiritualwarriors.lol_arena.domain.entity.Build;
 import com.spiritualwarriors.lol_arena.domain.entity.Champion;
@@ -76,12 +75,13 @@ public class BuildService {
 
         Build savedBuild = buildRepository.save(build);
 
-        if (request.getChampionId() != null) {
-            Champion champion = championRepository.findById(request.getChampionId())
-                    .orElseThrow(() -> new RuntimeException("Champion not found with id: " + request.getChampionId()));
-            champion.getBuilds().add(savedBuild);
-            championRepository.save(champion);
-            savedBuild.getChampions().add(champion);
+        if (request.getChampionIds() != null && !request.getChampionIds().isEmpty()) {
+            List<Champion> champions = championRepository.findAllById(request.getChampionIds());
+            for (Champion champion : champions) {
+                champion.getBuilds().add(savedBuild);
+                savedBuild.getChampions().add(champion);
+                championRepository.save(champion);
+            }
         }
 
         return mapToDto(savedBuild);
@@ -94,15 +94,23 @@ public class BuildService {
         dto.setDescription(build.getDescription());
         dto.setEffectivity(build.getEffectivity());
 
-        if (build.getChampions() != null && !build.getChampions().isEmpty()) {
-            Champion champ = build.getChampions().iterator().next();
-            dto.setChampionId(champ.getId());
-            dto.setChampionName(champ.getName());
-        }
-        
+        dto.setChampions(build.getChampions().stream()
+                .map(this::mapChampionToDto)
+                .collect(Collectors.toSet()));
+
         dto.setItems(build.getItems().stream().map(itemService::mapToDto).collect(Collectors.toSet()));
         dto.setAugments(build.getAugments().stream().map(augmentService::mapToDto).collect(Collectors.toSet()));
-        
+
+        return dto;
+    }
+
+    private ChampionDto mapChampionToDto(Champion champion) {
+        ChampionDto dto = new ChampionDto();
+        dto.setId(champion.getId());
+        dto.setName(champion.getName());
+        dto.setImage(champion.getImage());
+        dto.setEnabled(champion.getEnabled());
+        dto.setTags(champion.getTags());
         return dto;
     }
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 @Data
 public class CreateBuildRequest {
-    private String championId;
+    private List<String> championIds;
     private String title;
     private String description;
     private String effectivity;

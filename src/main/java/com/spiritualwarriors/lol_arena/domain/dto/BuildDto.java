@@ -6,8 +6,7 @@ import java.util.Set;
 @Data
 public class BuildDto {
     private Long id;
-    private String championId;
-    private String championName;
+    private Set<ChampionDto> champions;
     private String title;
     private String description;
     private String effectivity;
