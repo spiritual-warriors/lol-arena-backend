@@ -4,6 +4,7 @@ import com.spiritualwarriors.lol_arena.domain.dto.AugmentDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Augment;
 import com.spiritualwarriors.lol_arena.domain.entity.Tag;
 import com.spiritualwarriors.lol_arena.domain.repository.AugmentRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class AugmentService {
                 .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = "augments", allEntries = true)
     @Transactional
     public AugmentDto addTagsToAugment(Long augmentId, Set<Long> tagIds) {
         Augment augment = augmentRepository.findById(augmentId)
@@ -49,6 +51,7 @@ public class AugmentService {
         return mapToDto(saved);
     }
 
+    @CacheEvict(value = "augments", allEntries = true)
     @Transactional
     public AugmentDto removeTagFromAugment(Long augmentId, Long tagId) {
         Augment augment = augmentRepository.findById(augmentId)
