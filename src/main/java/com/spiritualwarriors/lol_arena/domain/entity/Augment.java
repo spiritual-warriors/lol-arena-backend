@@ -26,6 +26,9 @@ public class Augment {
 
     private String tier;
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
     private String image;
 
     @Column(nullable = false)
