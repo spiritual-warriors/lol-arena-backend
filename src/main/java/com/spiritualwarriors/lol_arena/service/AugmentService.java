@@ -9,12 +9,23 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class AugmentService {
+
+    private static final Map<String, Integer> TIER_ORDER = Map.of(
+            "Prismatic", 0,
+            "Gold", 1,
+            "Silver", 2);
+
+    static final Comparator<Augment> BY_TIER = Comparator
+            .comparingInt((Augment a) -> TIER_ORDER.getOrDefault(a.getTier(), 99))
+            .thenComparing(Augment::getId);
 
     private final AugmentRepository augmentRepository;
     private final TagService tagService;
@@ -27,6 +38,7 @@ public class AugmentService {
     @Cacheable(value = "augments", key = "'all'")
     public List<AugmentDto> getAllAugments() {
         return augmentRepository.findAllWithTags().stream()
+                .sorted(BY_TIER)
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -34,6 +46,7 @@ public class AugmentService {
     @Cacheable(value = "augments", key = "'tag:' + #tagSlug")
     public List<AugmentDto> getAugmentsByTag(String tagSlug) {
         return augmentRepository.findByTagSlugWithTags(tagSlug).stream()
+                .sorted(BY_TIER)
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }

@@ -13,8 +13,10 @@ import com.spiritualwarriors.lol_arena.domain.repository.ChampionRepository;
 import com.spiritualwarriors.lol_arena.domain.repository.ItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Sort;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,15 +44,16 @@ public class BuildService {
         this.augmentService = augmentService;
     }
 
+    @Transactional(readOnly = true)
     public BuildDto getBuildById(Long id) {
         Build build = buildRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Build not found with id: " + id));
         return mapToDto(build);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<BuildDto> getAllBuilds() {
-        return buildRepository.findAll().stream()
+        return buildRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -93,13 +96,17 @@ public class BuildService {
         dto.setTitle(build.getTitle());
         dto.setDescription(build.getDescription());
         dto.setEffectivity(build.getEffectivity());
+        dto.setCreatedAt(build.getCreatedAt());
 
         dto.setChampions(build.getChampions().stream()
                 .map(this::mapChampionToDto)
                 .collect(Collectors.toSet()));
 
-        dto.setItems(build.getItems().stream().map(itemService::mapToDto).collect(Collectors.toSet()));
-        dto.setAugments(build.getAugments().stream().map(augmentService::mapToDto).collect(Collectors.toSet()));
+        dto.setItems(build.getItems().stream().map(itemService::mapToDto).collect(Collectors.toCollection(LinkedHashSet::new)));
+        dto.setAugments(build.getAugments().stream()
+                .sorted(AugmentService.BY_TIER)
+                .map(augmentService::mapToDto)
+                .collect(Collectors.toCollection(LinkedHashSet::new)));
 
         return dto;
     }
