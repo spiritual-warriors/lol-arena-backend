@@ -5,6 +5,7 @@ import com.spiritualwarriors.lol_arena.domain.dto.BuildDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Build;
 import com.spiritualwarriors.lol_arena.domain.entity.Champion;
 import com.spiritualwarriors.lol_arena.domain.repository.ChampionRepository;
+import com.spiritualwarriors.lol_arena.exception.ResourceNotFoundException;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +36,13 @@ public class ChampionService {
     @Cacheable(value = "champions", key = "#id")
     public ChampionDto getChampionById(String id) {
         Champion champion = championRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Champion not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Champion not found with id: " + id));
         return mapToDto(champion);
     }
 
     public List<BuildDto> getChampionBuilds(String id) {
         Champion champion = championRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Champion not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Champion not found with id: " + id));
         return champion.getBuilds().stream()
                 .sorted(Comparator.comparing(Build::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder())))
                 .map(buildService::mapToDto)

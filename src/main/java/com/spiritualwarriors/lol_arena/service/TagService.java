@@ -3,6 +3,7 @@ package com.spiritualwarriors.lol_arena.service;
 import com.spiritualwarriors.lol_arena.domain.dto.TagDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Tag;
 import com.spiritualwarriors.lol_arena.domain.repository.TagRepository;
+import com.spiritualwarriors.lol_arena.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class TagService {
 
     public Tag getTagEntity(Long id) {
         return tagRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tag not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Tag not found with id: " + id));
     }
 
     TagDto mapToDto(Tag tag) {

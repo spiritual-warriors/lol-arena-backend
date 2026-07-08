@@ -4,6 +4,7 @@ import com.spiritualwarriors.lol_arena.domain.dto.ItemDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Item;
 import com.spiritualwarriors.lol_arena.domain.entity.Tag;
 import com.spiritualwarriors.lol_arena.domain.repository.ItemRepository;
+import com.spiritualwarriors.lol_arena.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,7 @@ public class ItemService {
     @Transactional
     public ItemDto setItemEnabled(Long itemId, boolean enabled) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found with id: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + itemId));
         item.setEnabled(enabled);
         Item saved = itemRepository.save(item);
         return mapToDto(saved);
@@ -52,7 +53,7 @@ public class ItemService {
     @Transactional
     public ItemDto addTagsToItem(Long itemId, Set<Long> tagIds) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found with id: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + itemId));
         for (Long tagId : tagIds) {
             Tag tag = tagService.getTagEntity(tagId);
             item.getTags().add(tag);
@@ -64,7 +65,7 @@ public class ItemService {
     @Transactional
     public ItemDto removeTagFromItem(Long itemId, Long tagId) {
         Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found with id: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + itemId));
         Tag tag = tagService.getTagEntity(tagId);
         item.getTags().remove(tag);
         Item saved = itemRepository.save(item);

@@ -4,6 +4,7 @@ import com.spiritualwarriors.lol_arena.domain.dto.AugmentDto;
 import com.spiritualwarriors.lol_arena.domain.entity.Augment;
 import com.spiritualwarriors.lol_arena.domain.entity.Tag;
 import com.spiritualwarriors.lol_arena.domain.repository.AugmentRepository;
+import com.spiritualwarriors.lol_arena.exception.ResourceNotFoundException;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class AugmentService {
     @Transactional
     public AugmentDto addTagsToAugment(Long augmentId, Set<Long> tagIds) {
         Augment augment = augmentRepository.findById(augmentId)
-                .orElseThrow(() -> new RuntimeException("Augment not found with id: " + augmentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Augment not found with id: " + augmentId));
         for (Long tagId : tagIds) {
             Tag tag = tagService.getTagEntity(tagId);
             augment.getTags().add(tag);
@@ -68,7 +69,7 @@ public class AugmentService {
     @Transactional
     public AugmentDto removeTagFromAugment(Long augmentId, Long tagId) {
         Augment augment = augmentRepository.findById(augmentId)
-                .orElseThrow(() -> new RuntimeException("Augment not found with id: " + augmentId));
+                .orElseThrow(() -> new ResourceNotFoundException("Augment not found with id: " + augmentId));
         Tag tag = tagService.getTagEntity(tagId);
         augment.getTags().remove(tag);
         Augment saved = augmentRepository.save(augment);

@@ -11,6 +11,9 @@ import com.spiritualwarriors.lol_arena.domain.repository.AugmentRepository;
 import com.spiritualwarriors.lol_arena.domain.repository.BuildRepository;
 import com.spiritualwarriors.lol_arena.domain.repository.ChampionRepository;
 import com.spiritualwarriors.lol_arena.domain.repository.ItemRepository;
+import com.spiritualwarriors.lol_arena.exception.ResourceNotFoundException;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Sort;
@@ -47,18 +50,20 @@ public class BuildService {
     @Transactional(readOnly = true)
     public BuildDto getBuildById(Long id) {
         Build build = buildRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Build not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Build not found with id: " + id));
         return mapToDto(build);
     }
 
     @Transactional(readOnly = true)
+    @Cacheable("builds")
     public List<BuildDto> getAllBuilds() {
-        return buildRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
+        return buildRepository.findAllBy(Sort.by(Sort.Direction.DESC, "createdAt")).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
+    @CacheEvict(value = "builds", allEntries = true)
     public BuildDto createBuild(CreateBuildRequest request) {
         Build build = Build.builder()
                 .title(request.getTitle())
