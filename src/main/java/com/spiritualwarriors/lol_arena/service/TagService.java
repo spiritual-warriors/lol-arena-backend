@@ -18,8 +18,13 @@ public class TagService {
         this.tagRepository = tagRepository;
     }
 
-    public List<TagDto> getAllTags() {
-        return tagRepository.findAll().stream()
+    public List<TagDto> getAllTags(String applicableTo) {
+        if (applicableTo == null || applicableTo.isEmpty()) {
+            return tagRepository.findAll().stream()
+                    .map(this::mapToDto)
+                    .collect(Collectors.toList());
+        }
+        return tagRepository.findAllByApplicableToContaining(applicableTo).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
@@ -31,6 +36,8 @@ public class TagService {
         Tag tag = Tag.builder()
                 .name(request.getName())
                 .slug(request.getSlug())
+                .category(request.getCategory() != null ? request.getCategory() : "custom")
+                .applicableTo(request.getApplicableTo() != null ? request.getApplicableTo() : List.of("ITEM", "AUGMENT"))
                 .build();
         Tag saved = tagRepository.save(tag);
         return mapToDto(saved);
@@ -46,6 +53,8 @@ public class TagService {
         dto.setId(tag.getId());
         dto.setName(tag.getName());
         dto.setSlug(tag.getSlug());
+        dto.setCategory(tag.getCategory());
+        dto.setApplicableTo(tag.getApplicableTo());
         return dto;
     }
 }

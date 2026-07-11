@@ -56,6 +56,10 @@ public class ItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + itemId));
         for (Long tagId : tagIds) {
             Tag tag = tagService.getTagEntity(tagId);
+            if (tag.getApplicableTo() == null || !tag.getApplicableTo().contains("ITEM")) {
+                throw new IllegalArgumentException(
+                        "Tag '" + tag.getSlug() + "' is not applicable to items");
+            }
             item.getTags().add(tag);
         }
         Item saved = itemRepository.save(item);

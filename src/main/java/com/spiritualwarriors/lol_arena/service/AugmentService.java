@@ -59,6 +59,10 @@ public class AugmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Augment not found with id: " + augmentId));
         for (Long tagId : tagIds) {
             Tag tag = tagService.getTagEntity(tagId);
+            if (tag.getApplicableTo() == null || !tag.getApplicableTo().contains("AUGMENT")) {
+                throw new IllegalArgumentException(
+                        "Tag '" + tag.getSlug() + "' is not applicable to augments");
+            }
             augment.getTags().add(tag);
         }
         Augment saved = augmentRepository.save(augment);

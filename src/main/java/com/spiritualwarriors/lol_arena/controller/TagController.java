@@ -19,15 +19,18 @@ public class TagController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TagDto>> getAllTags() {
-        return ResponseEntity.ok(tagService.getAllTags());
+    public ResponseEntity<List<TagDto>> getAllTags(
+            @RequestParam(required = false) String applicableTo) {
+        return ResponseEntity.ok(tagService.getAllTags(applicableTo));
     }
 
     @PostMapping
     public ResponseEntity<TagDto> createTag(@RequestBody CreateTagRequest request) {
-        TagDto tag = tagService.createTag(new TagDto() {{ 
-            setName(request.getName()); 
-            setSlug(request.getSlug()); 
+        TagDto tag = tagService.createTag(new TagDto() {{
+            setName(request.getName());
+            setSlug(request.getSlug());
+            setCategory(request.getCategory());
+            setApplicableTo(request.getApplicableTo());
         }});
         return ResponseEntity.ok(tag);
     }
